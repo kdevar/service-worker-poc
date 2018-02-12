@@ -1,0 +1,17 @@
+{
+  "name": "service-worker",
+  "version": "1.0.0",
+  "description": "service worker impl for products ",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "build": "webpack",
+    "build:local" : "cross-env NODE_ENV=local webpack"
+  },
+  "author": "Kiran Devarakonda",
+  "license": "ISC",
+  "devDependencies": {
+    "cross-env": "^5.1.3",
+    "webpack": "^3.11.0"
+  }
+}
