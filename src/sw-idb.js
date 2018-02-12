@@ -54,7 +54,7 @@ function setTimestampForUrl({db, url, propertyid, userid, timestamp}) {
 
 
   
-function expireOldEntries({db, maxAgeSeconds, now}) {
+function expireOldEntries({db, maxAgeSeconds, now, userId}) {
     if (!maxAgeSeconds) {
       return Promise.resolve([]);
     }
@@ -71,7 +71,8 @@ function expireOldEntries({db, maxAgeSeconds, now}) {
       index.openCursor().onsuccess = function(cursorEvent) {
         var cursor = cursorEvent.target.result;
         if (cursor) {
-          if (now - maxAgeMillis > cursor.value[TIMESTAMP_PROPERTY]) {
+          if (now - maxAgeMillis > cursor.value[TIMESTAMP_PROPERTY] ||
+             cursor.value[USER_ID_PROPERTY] !== userId) {
             var url = cursor.value[URL_PROPERTY];
             urls.push(url);
             objectStore.delete(url);
@@ -127,8 +128,8 @@ function expireOldEntries({db, maxAgeSeconds, now}) {
     });
   }
   
-  function expireEntries(db, maxEntries, maxAgeSeconds, now) {
-    return expireOldEntries(db, maxAgeSeconds, now).then(function(oldUrls) {
+  function expireEntries(db, maxEntries, maxAgeSeconds, now, userId) {
+    return expireOldEntries({db, maxAgeSeconds, now, userId}).then(function(oldUrls) {
       return expireExtraEntries(db, maxEntries).then(function(extraUrls) {
         return oldUrls.concat(extraUrls);
       });

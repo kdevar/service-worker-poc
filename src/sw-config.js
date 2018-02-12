@@ -1,4 +1,4 @@
-const config = {
+const config = {    
     excludeMatcher: [
         /^.*\.(?!jpg$|png|js|css|less|png|gif|html|htm$)[^.]+$/gi
     ],
@@ -10,11 +10,14 @@ const config = {
         '/pds/properties/{id}/stackingPlan',
         '/pds/properties/{id}/saleCompList'
     ],
-    timeToLiveInSeconds: 600,
-    enabled: true,
+    timeToLiveInSeconds: 1200,    
     debug: true,
-    maxEntries: 100,
+    maxEntries: 120,
     cacheName: "ppw-master"     
 }
 
-export {config};
+function getconfig(){
+    return config;
+}
+
+export {config, getconfig};

@@ -11,6 +11,6 @@ module.exports = {
   entry: './src/sw.js',
   output: {
     path: path.resolve(__dirname, outputFolder),
-    filename: 'service-worker.js'
+    filename: 'detail-service-worker.js'
   }
 };

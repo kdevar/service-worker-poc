@@ -1,6 +1,6 @@
 import {prefetchResources} from './sw-prefetch';
 import {debug, skipUrl, fetchAndCache} from './sw-helper';
-import {config} from './sw-config';
+import {config, getconfig} from './sw-config';
 import * as idb from './sw-idb';
 
 function doRequest(event) {    
@@ -31,11 +31,13 @@ self.addEventListener('message', (message) => {
             return clearAllCaches();
         case 'CACHEREVIEW':
         return idb.getDb(config.cacheName).then(db => {
-            return idb.expireEntries(db, config.maxEntries, config.timeToLiveInSeconds, Date.now()).then(urlstodelete => {
+            return idb.expireEntries(db, config.maxEntries, config.timeToLiveInSeconds, Date.now(), message.data.userId).then(urlstodelete => {
                 return caches.open(config.cacheName).then(cache => {
                     return Promise.all(
                         urlstodelete.map(url => cache.delete(url).then(() =>  debug(`${url} deleted`)))
                     )
+                }).then(() => {
+                    message.ports[0].postMessage({done:true, error:false});
                 })
             })
         })        
@@ -52,7 +54,7 @@ self.addEventListener('activate', function (event) {
 });
 
 self.addEventListener('fetch', function (event) {
-    if(!skipUrl(event.request.url)){
+    if(!skipUrl(event.request.url)){           
         event.respondWith(doRequest(event));
-    }    
+    }
 });

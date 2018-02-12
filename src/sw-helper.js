@@ -39,7 +39,7 @@ function fetchAndCache(event) {
             !skipUrl(event.request.url) &&
             response.type !== "opaque") {
             return caches.open(config.cacheName).then(function (cache) {
-                queueCacheRecord(event.request);
+                queueDbWrite(event.request);
                 cache.put(event.request, response.clone());
                 return response;
             });
@@ -48,21 +48,21 @@ function fetchAndCache(event) {
     });
 }
 
-var cacheRecordQueue;
+var dbWriteQueue;
 
-function queueCacheRecord(request){
-    var q = recordCacheTime.bind(this, request);
-    if(cacheRecordQueue){
-        cacheRecordQueue = cacheRecordQueue.then(q);
+function queueDbWrite(request){
+    var q = dbWrite.bind(this, request);
+    if(dbWriteQueue){
+        dbWriteQueue = dbWriteQueue.then(q);
     }else{
-        cacheRecordQueue = q();
+        dbWriteQueue = q();
     }
 }
 
-function recordCacheTime(request){
+function dbWrite(request){
     var url = request.url;
     var propertyid = request.headers.get("property-id");
-    var userid = null;
+    var userid = request.headers.get("user-id");
     var timestamp = Date.now();
     return idb.getDb(config.cacheName).then(db => {
         return idb.setTimestampForUrl({db, url, propertyid, userid, timestamp})
@@ -74,5 +74,5 @@ export {
     skipUrl,
     displayStorage,
     fetchAndCache,
-    queueCacheRecord
+    queueDbWrite
 }
