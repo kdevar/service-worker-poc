@@ -1,7 +1,4 @@
 const config = {    
-    excludeMatcher: [
-        /^.*\.(?!jpg$|png|js|css|less|png|gif|html|htm$)[^.]+$/gi
-    ],
     prefetchEnabled: true,
     prefetchUrls: [
         '/pds/properties/{id}/forSaleList',
