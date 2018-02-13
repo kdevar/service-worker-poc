@@ -10,6 +10,7 @@ function doRequest(event) {
             return resp;
         }
         debug(`returning from network ${event.request.url}`);
+            
         return fetchAndCache(event);
     });
 }
@@ -54,7 +55,7 @@ self.addEventListener('activate', function (event) {
 });
 
 self.addEventListener('fetch', function (event) {
-    if(!skipUrl(event.request.url)){           
+    if(!skipUrl(event.request.url) && event.request.method === "GET"){           
         event.respondWith(doRequest(event));
     }
 });

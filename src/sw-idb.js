@@ -1,3 +1,5 @@
+import {debug} from './sw-helper';
+
 var DB_PREFIX = '';
 var DB_VERSION = 1;
 var STORE_NAME = 'store';
@@ -71,8 +73,12 @@ function expireOldEntries({db, maxAgeSeconds, now, userId}) {
       index.openCursor().onsuccess = function(cursorEvent) {
         var cursor = cursorEvent.target.result;
         if (cursor) {
-          if (now - maxAgeMillis > cursor.value[TIMESTAMP_PROPERTY] ||
-             cursor.value[USER_ID_PROPERTY] !== userId) {
+          if(cursor.value[USER_ID_PROPERTY] && cursor.value[USER_ID_PROPERTY] !== userId){
+            objectStore.clear();
+            debug("object store cleared for user switch");
+            cursor.continue();
+          }
+          if (now - maxAgeMillis > cursor.value[TIMESTAMP_PROPERTY]) {
             var url = cursor.value[URL_PROPERTY];
             urls.push(url);
             objectStore.delete(url);
@@ -135,6 +141,8 @@ function expireOldEntries({db, maxAgeSeconds, now, userId}) {
       });
     });
   }
+
+ 
 
   
 export {

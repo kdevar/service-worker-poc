@@ -19,6 +19,8 @@ function skipUrl(URL) {
         url.indexOf(".png") > -1 ||
         url.indexOf(".jpg") > -1 ||
         url.indexOf(".less") > -1 ||
+        url.indexOf(".gstatic") > -1 ||
+        url.indexOf(".googleapis") > -1 ||
         url.indexOf(".html") > -1;
     if (skip) {
         debug(`skipping ${url}`)
@@ -33,14 +35,22 @@ function displayStorage() {
     })
 }
 
-function fetchAndCache(event) {    
-    return fetch(event.request).then(function (response) {
-        if (event.request.method === "GET" &&
-            !skipUrl(event.request.url) &&
+function fetchAndCache(event) {  
+    let headers = new Headers(event.request.headers);
+    headers.delete("property-id");
+    headers.delete("user-id");
+    let request = new Request(event.request.url, { 
+        credentials: 'include', 
+        headers,
+        method: event.request.method
+    });     
+    return fetch(request).then(function (response) {
+        if (request.method === "GET" &&
+            !skipUrl(request.url) &&
             response.type !== "opaque") {
             return caches.open(config.cacheName).then(function (cache) {
                 queueDbWrite(event.request);
-                cache.put(event.request, response.clone());
+                cache.put(request, response.clone());
                 return response;
             });
         }
