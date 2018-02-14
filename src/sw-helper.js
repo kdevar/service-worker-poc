@@ -1,4 +1,3 @@
-import {debug, skipUrl} from './sw-helper';
 import {config} from './sw-config';
 import * as idb from './sw-idb';
 
